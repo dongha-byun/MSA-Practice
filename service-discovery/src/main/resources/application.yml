@@ -1,0 +1,17 @@
+# 유레카 서버가 실행될 포트번호 명시
+server:
+  port: 8761
+
+# 마이크로 서비스의 고유의 ID 로 사용함(spring.application.name)
+spring:
+  application:
+    name: discoveryService
+
+# 유레카 설정
+# 유레카 서버가 구동될 때, 마이크로 서비스의 목록들을 등록하게됨.
+# 이 때, 유레카 서버 자신도 client 로써 목록에 등록하게되어 자신이 자신을 목록에 등록하는 작업이 이루어짐(예외가 터지네?)
+# 그 작업을 하지 않기 위해 아래 두 설정(eureka.client.register-with-eureka, eureka.client.fetch-registry) 을 false 로 지정함
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
