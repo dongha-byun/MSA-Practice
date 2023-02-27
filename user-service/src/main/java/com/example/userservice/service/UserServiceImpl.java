@@ -25,15 +25,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        System.out.println("In >>>>> UserServiceImpl.loadUserByUsername");
-
         User findUser = userRepository.findByEmail(username)
                 .orElseThrow(
                         () -> new UsernameNotFoundException(username)
                 );
 
-        System.out.println("Out <<<<<< UserServiceImpl.loadUserByUsername");
         return new org.springframework.security.core.userdetails.User(
                 findUser.getEmail(), findUser.getEncryptPassword(),
                 true, true, true, true,
@@ -68,5 +64,15 @@ public class UserServiceImpl implements UserService {
         return users.stream()
                 .map(UserDto::of)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDto getUserDetailsByEmail(String userName) {
+        User user = userRepository.findByEmail(userName)
+                .orElseThrow(
+                        () -> new UsernameNotFoundException("사용자 조회 불가")
+                );
+
+        return UserDto.of(user);
     }
 }

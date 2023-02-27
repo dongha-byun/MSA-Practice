@@ -1,43 +1,47 @@
 package com.example.userservice.security;
 
+import com.example.userservice.dto.UserDto;
+import com.example.userservice.service.UserService;
 import com.example.userservice.vo.RequestLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@RequiredArgsConstructor
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+    private final UserService userService;
+    private final Environment env;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-
-        log.info("getAuthenticationManager : {}", getAuthenticationManager());
         try {
             RequestLogin credential = new ObjectMapper().readValue(request.getInputStream(), RequestLogin.class);
-            log.info("credential : {}", credential.toString());
-
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+            return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(
                     credential.getEmail(),
                     credential.getPassword(),
-                    new ArrayList<>());
-            log.info("token : {}", token);
-
-            Authentication authenticate = getAuthenticationManager().authenticate(token);
-            log.info("authenticate : {}", authenticate);
-
-            return authenticate;
+                    new ArrayList<>()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -46,10 +50,22 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-        log.info("successful authentication!");
-        response.setHeader("TRY_LOGIN_RESULT", "SUCCESS");
+        String userName = ((User) authResult.getPrincipal()).getUsername();
+        UserDto userDetailsDto = userService.getUserDetailsByEmail(userName);
 
-        log.info("auth user name : {}", ((User)authResult.getPrincipal()).getUsername());
+        log.info("userDetailsDto : {}", userDetailsDto);
+
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        String token = Jwts.builder()
+                .setSubject(userDetailsDto.getUserId())
+                .setExpiration(new Date(System.currentTimeMillis() +
+                        Long.parseLong(Objects.requireNonNull(env.getProperty("token.expiration_time")))))
+                .signWith(key)
+                .compact();
+
+        response.addHeader("token", token);
+        response.addHeader("userId", userDetailsDto.getUserId());
+
         //super.successfulAuthentication(request, response, chain, authResult);
     }
 }

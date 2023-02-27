@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,11 +20,7 @@ public class WebSecurity {
 
     private final AuthenticationConfiguration configuration;
     private final UserService userService;
-
-    private static final String[] WHITE_LIST = {
-            "/users/**",
-            "/**"
-    };
+    private final Environment env;
 
     @Bean
     protected SecurityFilterChain config(HttpSecurity httpSecurity) throws Exception {
@@ -42,10 +39,7 @@ public class WebSecurity {
     }
 
     private AuthenticationFilter authenticationFilter() throws Exception {
-        log.info("configuration : {}", configuration);
-        log.info("configuration.getAuthenticationManager() : {}", configuration.getAuthenticationManager());
-
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter();
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(userService, env);
         authenticationFilter.setAuthenticationManager(configuration.getAuthenticationManager());
 
         return authenticationFilter;
