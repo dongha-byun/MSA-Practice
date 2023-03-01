@@ -1,0 +1,30 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-service
+#  profiles:
+#    active: native
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file://${user.home}/byun/spring/inflearn/msa/file-local-repo
+        git:
+#          uri: file:///Users/byundongha/byun/spring/inflearn/msa/git-local-repo
+          uri: https://github.com/dongha-byun/git-local-repo.git
+#          git repository 가 private repository 인 경우, 아래 username 과 password 가 필요
+#          username: dongha-byun
+#          password: [password]
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, busrefresh
