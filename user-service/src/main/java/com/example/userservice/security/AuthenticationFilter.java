@@ -9,10 +9,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -52,20 +50,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication authResult) throws IOException, ServletException {
         String userName = ((User) authResult.getPrincipal()).getUsername();
         UserDto userDetailsDto = userService.getUserDetailsByEmail(userName);
-
         log.info("userDetailsDto : {}", userDetailsDto);
 
-        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        SecretKey key = Keys.hmacShaKeyFor(env.getProperty("token.secret", "secret_key").getBytes(StandardCharsets.UTF_8));
         String token = Jwts.builder()
                 .setSubject(userDetailsDto.getUserId())
                 .setExpiration(new Date(System.currentTimeMillis() +
-                        Long.parseLong(Objects.requireNonNull(env.getProperty("token.expiration_time")))))
-                .signWith(key)
+                        Long.parseLong((env.getProperty("token.expiration_time", "1800000")))))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         response.addHeader("token", token);
         response.addHeader("userId", userDetailsDto.getUserId());
-
-        //super.successfulAuthentication(request, response, chain, authResult);
     }
 }

@@ -27,6 +27,7 @@ public class WebSecurity {
 
         httpSecurity.csrf().disable();
         httpSecurity.headers().frameOptions().disable();
+        httpSecurity.authorizeRequests().antMatchers("/actuator/**").permitAll();
         httpSecurity.authorizeRequests().antMatchers("/**")
                 //.hasIpAddress("30.20.0.115")
                 .permitAll()

@@ -7,10 +7,10 @@ spring:
   application:
     name: user-service
 
-  datasource:
-    url: jdbc:h2:mem:testdb
-    generate-unique-name: false
-    driver-class-name: org.h2.Driver
+#  datasource:
+#    url: jdbc:h2:mem:testdb
+#    generate-unique-name: false
+#    driver-class-name: org.h2.Driver
 
   h2:
     console:
@@ -24,6 +24,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
 
 eureka:
   instance:
@@ -46,9 +52,17 @@ logging:
             sql:
               BasicBinder: TRACE
 
+# config server 에서 무중단 형태로 설정정보를 가져오기 위한 설정
+# rabbitMQ 사용을 위해 busrefresh 추가
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh
+
 # jwt 에서 사용할 정보들 명시
 # expiration_time : access token 유효 시간
 # secret: token 생성 시, 암복호화 키
-token:
-  expiration_time: 1800000 # 30분 -> 1000 * 60 * 30 = 1800 * 1000 = 1800000
-  secret: dong_ha_token_key
+#token:
+#  expiration_time: 1800000 # 30분 -> 1000 * 60 * 30 = 1800 * 1000 = 1800000
+#  secret: dong_ha_token_key_must_be_as_long_as_possible_because_of_strong_security
