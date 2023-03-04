@@ -51,6 +51,7 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+    com.example.userservice.client: DEBUG
 
 # config server 에서 무중단 형태로 설정정보를 가져오기 위한 설정
 # rabbitMQ 사용을 위해 busrefresh 추가
@@ -66,3 +67,4 @@ management:
 #token:
 #  expiration_time: 1800000 # 30분 -> 1000 * 60 * 30 = 1800 * 1000 = 1800000
 #  secret: dong_ha_token_key_must_be_as_long_as_possible_because_of_strong_security
+

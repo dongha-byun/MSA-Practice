@@ -21,6 +21,6 @@ public class ResponseUser {
     private List<ResponseOrder> orders;
 
     public static ResponseUser of(UserDto userDto) {
-        return new ResponseUser(userDto.getUserId(), userDto.getEmail(), userDto.getName(), null);
+        return new ResponseUser(userDto.getUserId(), userDto.getEmail(), userDto.getName(), userDto.getOrders());
     }
 }
