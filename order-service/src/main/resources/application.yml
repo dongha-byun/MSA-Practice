@@ -15,9 +15,13 @@ spring:
     #defer-datasource-initialization: true # spring 2.5.x 부터 hibernate 초기화 보다 data.sql 실행이 먼저돼서 기초데이터 생성이 안되는 오류 보완
 
   datasource:
-    url: jdbc:h2:mem:testdb
-    generate-unique-name: false
-    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:testdb
+#    generate-unique-name: false
+#    driver-class-name: org.h2.Driver
+    url: jdbc:mariadb://localhost:3306/mydb
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    password: test1357
 
   h2:
     console:

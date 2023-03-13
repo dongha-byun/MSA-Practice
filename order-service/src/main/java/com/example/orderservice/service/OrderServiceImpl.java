@@ -18,8 +18,8 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public OrderDto createOrder(OrderDto orderDetails) {
-        orderDetails.setOrderId(UUID.randomUUID().toString());
-        orderDetails.setTotalPrice(orderDetails.getUnitPrice() * orderDetails.getQuantity());
+//        orderDetails.setOrderId(UUID.randomUUID().toString());
+//        orderDetails.setTotalPrice(orderDetails.getUnitPrice() * orderDetails.getQuantity());
 
         Order order = orderRepository.save(OrderDto.to(orderDetails));
 
